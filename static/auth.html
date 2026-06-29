@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход / Регистрация — Фрэд</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: #f0f2f5;
+            border-radius: 12px;
+            padding: 4px;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border: none;
+            background: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            background: white;
+            color: #2c3e50;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #667EEA;
+            outline: none;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .error-msg {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+        .error-msg.show {
+            display: block;
+        }
+        .success-msg {
+            color: #27ae60;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+        .success-msg.show {
+            display: block;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+            color: #667EEA;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🧮 Фрэд</div>
+        <div class="subtitle">ИИ-репетитор по математике</div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('login')">Вход</button>
+            <button class="tab" onclick="switchTab('register')">Регистрация</button>
+        </div>
+
+        <!-- Форма входа -->
+        <div id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="example@mail.ru">
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" placeholder="••••••••">
+            </div>
+            <button class="btn-primary" onclick="login()">Войти</button>
+            <div id="loginError" class="error-msg"></div>
+        </div>
+
+        <!-- Форма регистрации -->
+        <div id="registerForm" class="hidden">
+            <div class="form-group">
+                <label>Имя</label>
+                <input type="text" id="regName" placeholder="Ваше имя">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="example@mail.ru">
+            </div>
+            <div class="form-group">
+                <label>Пароль (минимум 6 символов)</label>
+                <input type="password" id="regPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label>Кто вы?</label>
+                <select id="regRole">
+                    <option value="student">👨‍🎓 Ученик</option>
+                    <option value="parent">👨‍👩‍👧 Родитель</option>
+                    <option value="teacher">👨‍🏫 Учитель</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="register()">Зарегистрироваться</button>
+            <div id="regError" class="error-msg"></div>
+            <div id="regSuccess" class="success-msg"></div>
+        </div>
+
+        <a href="/" class="back-link">← Вернуться на главную</a>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(function(t) {
+                t.classList.remove('active');
+            });
+            if (tab === 'login') {
+                document.querySelector('.tab:first-child').classList.add('active');
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+            } else {
+                document.querySelector('.tab:last-child').classList.add('active');
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('registerForm').classList.remove('hidden');
+            }
+        }
+
+        async function login() {
+            var email = document.getElementById('loginEmail').value.trim();
+            var password = document.getElementById('loginPassword').value.trim();
+            var errorDiv = document.getElementById('loginError');
+            errorDiv.classList.remove('show');
+            errorDiv.textContent = '';
+
+            if (!email || !password) {
+                errorDiv.textContent = 'Заполните все поля';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            try {
+                var response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: password })
+                });
+                var data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('fred_user_id', data.user_id);
+                    localStorage.setItem('fred_user_role', data.role);
+                    localStorage.setItem('fred_user_name', data.first_name || 'Пользователь');
+
+                    console.log('Роль пользователя:', data.role);
+
+                    var role = data.role;
+                    if (role === 'student') {
+                        window.location.href = '/static/student.html';
+                    } else if (role === 'parent') {
+                        window.location.href = '/static/parent.html';
+                    } else if (role === 'teacher') {
+                        window.location.href = '/static/teacher.html';
+                    } else {
+                        window.location.href = '/static/app_new.html';
+                    }
+                } else {
+                    errorDiv.textContent = data.detail || 'Ошибка входа';
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Ошибка сервера';
+                errorDiv.classList.add('show');
+            }
+        }
+
+        async function register() {
+            var name = document.getElementById('regName').value.trim();
+            var email = document.getElementById('regEmail').value.trim();
+            var password = document.getElementById('regPassword').value.trim();
+            var role = document.getElementById('regRole').value;
+            var errorDiv = document.getElementById('regError');
+            var successDiv = document.getElementById('regSuccess');
+            errorDiv.classList.remove('show');
+            successDiv.classList.remove('show');
+
+            if (!name || !email || !password) {
+                errorDiv.textContent = 'Заполните все поля';
+                errorDiv.classList.add('show');
+                return;
+            }
+            if (password.length < 6) {
+                errorDiv.textContent = 'Пароль должен быть минимум 6 символов';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            try {
+                var response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        first_name: name,
+                        role: role
+                    })
+                });
+                var data = await response.json();
+                if (response.ok) {
+                    successDiv.textContent = '✅ Регистрация успешна! Теперь войдите.';
+                    successDiv.classList.add('show');
+                    document.getElementById('regName').value = '';
+                    document.getElementById('regEmail').value = '';
+                    document.getElementById('regPassword').value = '';
+                    setTimeout(function() {
+                        switchTab('login');
+                    }, 1500);
+                } else {
+                    errorDiv.textContent = data.detail || 'Ошибка регистрации';
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Ошибка сервера';
+                errorDiv.classList.add('show');
+            }
+        }
+
+        document.getElementById('loginPassword').onkeypress = function(e) {
+            if (e.key === 'Enter') login();
+        };
+        document.getElementById('loginEmail').onkeypress = function(e) {
+            if (e.key === 'Enter') login();
+        };
+        document.getElementById('regPassword').onkeypress = function(e) {
+            if (e.key === 'Enter') register();
+        };
+    </script>
+</body>
+</html>

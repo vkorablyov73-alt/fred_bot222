@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Урок — Фрэд</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            color: #2c3e50;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #667EEA;
+        }
+
+        .badge {
+            background: #667EEA;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .mode-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .mode-tab {
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .mode-tab.active {
+            border-color: #667EEA;
+            background: #667EEA;
+            color: white;
+        }
+
+        .mode-tab.completed {
+            border-color: #27ae60;
+            background: #27ae60;
+            color: white;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 12px;
+            height: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667EEA, #764BA2);
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.4s ease;
+        }
+
+        .chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            padding-right: 4px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .message.fred {
+            background: #eef2ff;
+            color: #1a1a2e;
+        }
+
+        .message.user {
+            background: #667EEA;
+            color: white;
+        }
+
+        .message .meta {
+            font-size: 11px;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        .message .image-placeholder {
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            margin: 8px 0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .message .image-placeholder i {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 4px;
+            color: #667EEA;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .input-area input:focus {
+            border-color: #667EEA;
+        }
+
+        .input-area button {
+            background: #667EEA;
+            border: none;
+            padding: 0 20px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .actions button {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .actions .primary {
+            background: #667EEA;
+            color: white;
+        }
+
+        .actions .primary:hover {
+            background: #5a6fd6;
+        }
+
+        .actions .success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .actions .danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .actions .outline {
+            background: transparent;
+            border: 2px solid #667EEA;
+            color: #667EEA;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .typing {
+            color: #888;
+            font-style: italic;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 17px;
+            }
+            .mode-tab {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            .actions button {
+                font-size: 13px;
+                padding: 8px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Карточка урока -->
+        <div class="card">
+            <div class="header">
+                <button class="back-btn" onclick="window.location.href='/'"><i class="fas fa-arrow-left"></i></button>
+                <h1 id="topicTitle">📚 Урок</h1>
+                <span class="badge" id="lessonStatus">🔄</span>
+            </div>
+
+            <div class="mode-tabs" id="modeTabs">
+                <button class="mode-tab active" data-mode="theory" onclick="switchMode('theory')">📖 Теория</button>
+                <button class="mode-tab" data-mode="practice" onclick="switchMode('practice')">✍️ Практика</button>
+                <button class="mode-tab" data-mode="exam" onclick="switchMode('exam')">🎯 Контрольная</button>
+           <a href="/static/homework.html?lesson_id=1" class="mode-btn" style="background:#e67e22; color:white; text-decoration:none;">📝 ДЗ</a>
+
+ </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message fred" id="welcomeMessage">
+                    <div>👋 Привет! Я Фрэд. Сегодня мы будем изучать <strong id="topicNameDisplay">логарифмы</strong>.</div>
+                    <div style="margin-top:8px;">Готов начать?</div>
+                </div>
+            </div>
+
+            <div id="typingIndicator" class="typing hidden">Фрэд печатает...</div>
+
+            <div class="input-area" id="inputArea">
+                <input type="text" id="messageInput" placeholder="Напиши ответ или вопрос..." disabled>
+                <button id="sendBtn" disabled>📤</button>
+            </div>
+
+            <div class="actions" id="actionButtons">
+                <button class="primary" id="startLessonBtn">🚀 Начать урок</button>
+                <button class="success hidden" id="nextTaskBtn">➡️ Следующее</button>
+                <button class="danger hidden" id="finishLessonBtn">🔚 Завершить урок</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== СОСТОЯНИЕ =====
+        let userId = null;
+        let lessonId = null;
+        let currentMode = 'theory';
+        let currentStep = 0;
+        let isWaitingForAnswer = false;
+        let lessonData = null;
+
+        // ===== ПОЛУЧЕНИЕ USER_ID =====
+        function getUserId() {
+            let id = localStorage.getItem('fred_user_id');
+            if (!id) {
+                id = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+                localStorage.setItem('fred_user_id', id);
+            }
+            return id;
+        }
+
+        // ===== DOM =====
+        const messages = document.getElementById('chatMessages');
+        const input = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typing = document.getElementById('typingIndicator');
+        const progressFill = document.getElementById('progressFill');
+
+        // ===== ВСПОМОГАТЕЛЬНЫЕ =====
+        function addMessage(text, isUser = false, meta = null) {
+            const div = document.createElement('div');
+            div.className = `message ${isUser ? 'user' : 'fred'}`;
+            div.innerHTML = text;
+            if (meta) {
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'meta';
+                metaDiv.textContent = meta;
+                div.appendChild(metaDiv);
+            }
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function showTyping(show = true) {
+            typing.classList.toggle('hidden', !show);
+            if (show) messages.scrollTop = messages.scrollHeight;
+        }
+
+        function updateProgress(percent) {
+            progressFill.style.width = Math.min(100, Math.max(0, percent)) + '%';
+        }
+
+        function disableInput(disabled = true) {
+            input.disabled = disabled;
+            sendBtn.disabled = disabled;
+        }
+
+        // ===== СМЕНА РЕЖИМА =====
+        async function switchMode(mode) {
+            if (!lessonId) return;
+            currentMode = mode;
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.mode === mode);
+            });
+            
+            // Очищаем чат и загружаем новый контент
+            messages.innerHTML = '';
+            addMessage('🔄 Переключаемся на ' + (mode === 'theory' ? 'теорию' : mode === 'practice' ? 'практику' : 'контрольную') + '...');
+            await loadModeContent(mode);
+        }
+
+        // ===== ЗАГРУЗКА КОНТЕНТА РЕЖИМА =====
+        async function loadModeContent(mode) {
+            showTyping(true);
+            disableInput(true);
+            document.getElementById('startLessonBtn').classList.add('hidden');
+            document.getElementById('nextTaskBtn').classList.add('hidden');
+            document.getElementById('finishLessonBtn').classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/lesson/mode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        lesson_id: lessonId,
+                        mode: mode
+                    })
+                });
+                const data = await response.json();
+                showTyping(false);
+                
+                if (data.error) {
+                    addMessage('❌ ' + data.error);
+                    return;
+                }
+
+                // Показываем содержимое режима
+                if (data.content) {
+                    addMessage(data.content);
+                }
+
+                if (data.question) {
+                    addMessage('❓ ' + data.question);
+                    if (data.need_answer) {
+                        isWaitingForAnswer = true;
+                        disableInput(false);
+                    }
+                }
+
+                if (data.next_action) {
+                    if (data.next_action === 'next_task') {
+                        document.getElementById('nextTaskBtn').classList.remove('hidden');
+                    }
+                    if (data.next_action === 'finish_lesson') {
+                        document.getElementById('finishLessonBtn').classList.remove('hidden');
+                    }
+                }
+
+                updateProgress(data.progress || 0);
+
+            } catch (error) {
+                showTyping(false);
+                addMessage('😕 Ошибка загрузки. Попробуй ещё раз.');
+            }
+        }
+
+        // ===== НАЧАЛО УРОКА =====
+        async function startLesson() {
+            const topic = document.getElementById('topicNameDisplay').textContent;
+            
+            showTyping(true);
+            disableInput(true);
+
+            try {
+                const response = await fetch('/api/lesson/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        topic_id: 'A3',  // пока логарифмы
+                        topic_name: topic
+                    })
+                });
+                const data = await response.json();
+                showTyping(false);
+
+                if (data.error) {
+                    addMessage('❌ ' + data.error);
+                    return;
+                }
+
+                lessonId = data.lesson_id;
+                document.getElementById('lessonStatus').textContent = '📖 Идёт урок';
+                document.getElementById('startLessonBtn').classList.add('hidden');
+                document.getElementById('messageInput').disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+
+                // Загружаем теорию
+                await loadModeContent('theory');
+
+            } catch (error) {
+                showTyping(false);
+                addMessage('😕 Ошибка начала урока.');
+            }
+        }
+
+        // ===== ОТПРАВКА СООБЩЕНИЯ =====
+        async function sendMessage() {
+            const text = input.value.trim();
+            if (!text || !lessonId) return;
+
+            addMessage(text, true);
+            input.value = '';
+            disableInput(true);
+            showTyping(true);
+
+            try {
+                const response = await fetch('/api/lesson/answer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        lesson_id: lessonId,
+                        mode: currentMode,
+                        answer: text
+                    })
+                });
+                const data = await response.json();
+                showTyping(false);
+                disableInput(false);
+
+                if (data.error) {
+                    addMessage('❌ ' + data.error);
+                    return;
+                }
+
+                if (data.reply) {
+                    addMessage(data.reply);
+                }
+
+                if (data.next_action) {
+                    if (data.next_action === 'next_task') {
+                        document.getElementById('nextTaskBtn').classList.remove('hidden');
+                    }
+                    if (data.next_action === 'finish_lesson') {
+                        document.getElementById('finishLessonBtn').classList.remove('hidden');
+                    }
+                }
+
+                updateProgress(data.progress || 0);
+
+            } catch (error) {
+                showTyping(false);
+                addMessage('😕 Ошибка отправки.');
+                disableInput(false);
+            }
+        }
+
+        // ===== ОБРАБОТЧИКИ =====
+        document.getElementById('startLessonBtn').onclick = startLesson;
+        document.getElementById('nextTaskBtn').onclick = () => loadModeContent(currentMode);
+        document.getElementById('finishLessonBtn').onclick = () => {
+            alert('🏁 Урок завершён!');
+            window.location.href = '/';
+        };
+        sendBtn.onclick = sendMessage;
+        input.onkeypress = (e) => {
+            if (e.key === 'Enter') sendMessage();
+        };
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        userId = getUserId();
+        document.getElementById('topicNameDisplay').textContent = 'логарифмы';
+        document.getElementById('topicTitle').textContent = '📚 Урок: Логарифмы';
+
+        // Сразу показываем приветствие
+        addMessage('👋 Привет! Я Фрэд. Сегодня мы будем изучать <strong>логарифмы</strong>.');
+        addMessage('Нажми кнопку "Начать урок", и мы начнём!');
+    </script>
+</body>
+</html>

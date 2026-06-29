@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фрэд — Ученик</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+        .app { display: flex; flex-direction: column; height: 100vh; }
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .header h1 { font-size: 18px; font-weight: 500; }
+        .user-info { font-size: 14px; opacity: 0.8; }
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 25%;
+            min-width: 200px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+        .sidebar .avatar {
+            text-align: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .sidebar .avatar img { width: 60px; height: 60px; border-radius: 50%; background: #667EEA; padding: 4px; }
+        .sidebar .avatar .name { font-weight: 600; font-size: 16px; margin-top: 4px; }
+        .sidebar .avatar .role { font-size: 12px; color: #666; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-item:hover { background: #f0f4ff; color: #667EEA; }
+        .nav-item.active { background: #667EEA; color: white; }
+        .nav-item i { width: 20px; text-align: center; }
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+            overflow: hidden;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 16px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        .message.fred { background: white; align-self: flex-start; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        .message.user { background: #667EEA; color: white; align-self: flex-end; }
+        .chat-input {
+            padding: 12px 24px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            font-size: 14px;
+            outline: none;
+        }
+        .chat-input button {
+            background: #667EEA;
+            border: none;
+            padding: 0 20px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+        }
+        .footer {
+            background: #2c3e50;
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 8px;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .logout-btn {
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            background: none;
+        }
+        .logout-btn:hover { background: #e74c3c; color: white; }
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; min-width: 60px; padding: 8px; }
+            .sidebar .avatar .name, .sidebar .avatar .role, .nav-item span { display: none; }
+            .nav-item { justify-content: center; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>📚 Фрэд — Ученик</h1>
+            <div>
+                <span class="user-info" id="userName">👤 Загрузка...</span>
+                <button class="logout-btn" onclick="logout()">Выйти</button>
+            </div>
+        </header>
+
+        <div class="main">
+            <aside class="sidebar">
+                <div class="avatar">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23667EEA'/%3E%3Ccircle cx='35' cy='40' r='8' fill='white'/%3E%3Ccircle cx='65' cy='40' r='8' fill='white'/%3E%3Cpath d='M35 60 Q50 80 65 60' stroke='white' stroke-width='4' fill='none'/%3E%3C/svg%3E" alt="Фрэд">
+                    <div class="name" id="userNameSide">Ученик</div>
+                    <div class="role">👨‍🎓 Ученик</div>
+<div class="user-id" style="font-size: 12px; color: #888; margin-top: 4px;">
+    🆔 ID: <span id="userIdDisplay">загрузка...</span>
+    <button onclick="copyUserId()" style="background:none; border:none; cursor:pointer; color:#667EEA; font-size:12px;">📋 Копировать</button>
+</div>
+                </div>
+                <nav>
+                    <div class="nav-item active" onclick="switchMode('chat')"><i class="fas fa-comment"></i><span>Чат с Фрэдом</span></div>
+                    <div class="nav-item" onclick="window.location.href='/static/lesson.html'"><i class="fas fa-book-open"></i><span>Уроки</span></div>
+                    <div class="nav-item" onclick="window.location.href='/static/homework.html'"><i class="fas fa-home"></i><span>ДЗ</span></div>
+                    <div class="nav-item" onclick="window.location.href='/static/diagnostic.html'"><i class="fas fa-stethoscope"></i><span>Диагностика</span></div>
+                    <div class="nav-item" onclick="window.location.href='/static/stats.html'"><i class="fas fa-chart-line"></i><span>Статистика</span></div>
+                </nav>
+
+
+<div class="parent-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee;">
+    <div style="font-size: 13px; color: #555;" id="parentInfo">
+        👨‍👩‍👧 Родители: <span id="parentsList">Не привязаны</span>
+    </div>
+    <button onclick="inviteParent()" class="btn-primary" style="margin-top: 8px; background:#667EEA; color:white; border:none; padding:4px 14px; border-radius:20px; cursor:pointer; font-size:12px;">
+        📧 Пригласить родителя
+    </button>
+    <!-- Кнопки "Отвязаться" НЕТ -->
+</div>
+
+<div class="notifications" style="position: relative; cursor: pointer;" onclick="toggleNotifications()">
+    <i class="fas fa-bell" style="font-size: 20px; color: #667EEA;"></i>
+    <span id="notifCount" style="position: absolute; top: -8px; right: -8px; background: #e74c3c; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; display: none;">0</span>
+</div>
+<div id="notifDropdown" style="display: none; position: absolute; right: 0; top: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); min-width: 300px; max-width: 400px; padding: 12px; z-index: 1000; max-height: 300px; overflow-y: auto;">
+    <div id="notifList"></div>
+</div>
+
+            </aside>
+
+            <div class="chat-area">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message fred">👋 Привет! Я Фрэд — твой ИИ-репетитор. Чем могу помочь?</div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="messageInput" placeholder="Напиши вопрос...">
+                    <button id="sendBtn">📤</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">© 2026 Фрэд — ИИ-репетитор по математике</footer>
+    </div>
+
+    <script>
+        let userId = null;
+        let userName = '';
+
+        function getUserId() {
+            let id = localStorage.getItem('fred_user_id');
+            if (!id) window.location.href = '/static/auth.html';
+            return id;
+        }
+
+        function getUserName() {
+            return localStorage.getItem('fred_user_name') || 'Ученик';
+        }
+
+        function logout() {
+            localStorage.removeItem('fred_user_id');
+            localStorage.removeItem('fred_user_role');
+            localStorage.removeItem('fred_user_name');
+            window.location.href = '/static/auth.html';
+        }
+
+        function addMessage(text, isUser = false) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${isUser ? 'user' : 'fred'}`;
+            div.textContent = text;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+            addMessage(text, true);
+            input.value = '';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, message: text, mode: 'study' })
+                });
+                const data = await response.json();
+                addMessage(data.reply || '😕 Ошибка');
+            } catch (error) {
+                addMessage('😕 Ошибка сервера');
+            }
+        }
+
+        function switchMode(mode) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.nav-item[onclick*="${mode}"]`)?.classList.add('active');
+            if (mode === 'chat') {
+                document.getElementById('chatMessages').innerHTML = '';
+                addMessage('👋 Привет! Я Фрэд — твой ИИ-репетитор. Чем могу помочь?');
+                document.querySelector('.chat-area').style.display = 'flex';
+            }
+        }
+
+        userId = getUserId();
+        userName = getUserName();
+        document.getElementById('userName').textContent = `👤 ${userName}`;
+        document.getElementById('userNameSide').textContent = userName;
+
+        document.getElementById('sendBtn').onclick = sendMessage;
+        document.getElementById('messageInput').onkeypress = (e) => {
+            if (e.key === 'Enter') sendMessage();
+        };
+
+async function loadNotifications() {
+    try {
+        const response = await fetch(`/api/notifications?user_id=${userId}`);
+        const data = await response.json();
+        const list = document.getElementById('notifList');
+        const count = document.getElementById('notifCount');
+        
+        if (data.notifications && data.notifications.length > 0) {
+            list.innerHTML = data.notifications.map(n => `
+                <div style="padding: 8px 0; border-bottom: 1px solid #eee; ${n.is_read ? 'opacity: 0.7;' : ''}">
+                    <div style="font-weight: 600; font-size: 13px;">${n.title}</div>
+                    <div style="font-size: 12px; color: #666;">${n.message}</div>
+                    <div style="font-size: 10px; color: #999; margin-top: 4px;">${new Date(n.created_at).toLocaleDateString()}</div>
+                </div>
+            `).join('');
+            
+            const unread = data.notifications.filter(n => !n.is_read).length;
+            if (unread > 0) {
+                count.textContent = unread;
+                count.style.display = 'inline';
+            }
+        } else {
+            list.innerHTML = '<div style="padding: 12px; color: #888; text-align: center;">Нет уведомлений</div>';
+            count.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки уведомлений:', error);
+    }
+}
+
+function toggleNotifications() {
+    const dropdown = document.getElementById('notifDropdown');
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+}
+
+function copyUserId() {
+    const id = document.getElementById('userIdDisplay').textContent;
+    navigator.clipboard.writeText(id).then(() => {
+        alert('✅ ID скопирован в буфер обмена');
+    }).catch(() => {
+        // fallback
+        const input = document.createElement('input');
+        input.value = id;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        alert('✅ ID скопирован');
+    });
+}
+
+// В начале скрипта, после получения userId:
+document.getElementById('userIdDisplay').textContent = userId;
+    </script>
+</body>
+</html>
